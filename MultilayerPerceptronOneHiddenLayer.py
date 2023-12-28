@@ -71,21 +71,47 @@ class MultilayerPerceptronRegressor(BaseEstimator, RegressorMixin):
         return 1 / (1 + np.exp(-s))
 
     def forward(self, X):
-        hidden_input = np.dot(self.weights_hidden, np.concatenate(([1], X)))
+        X = np.concatenate(([1], X))
+        hidden_input = np.dot(self.weights_hidden,  X)
         hidden_output = self.sigmoid(hidden_input)
-        output = np.dot(self.weights_output, np.concatenate(([1], hidden_output)))
+        hidden_output_with_bias = np.concatenate(([1], hidden_output))
+        output = np.dot(self.weights_output, hidden_output_with_bias)
         return hidden_input, hidden_output, output
 
+# wersja do oddania (rozumiem co sie tu dzieje)
     def backward(self, X, y, hidden_input, hidden_output, output):
-        self.weights_output -= self.learning_rate * (
-            (output - y) * np.concatenate(([1], hidden_output))
-        )
-        self.weights_hidden -= self.learning_rate * np.outer(
-            np.dot((output - y), self.weights_output[:, 1:])
-            * hidden_output
-            * (1 - hidden_output),
-            np.concatenate(([1], X)),
-        )
+        X = np.concatenate(([1], X))
+        hidden_output = np.concatenate(([1], hidden_output))
+        error = output - y
+        k, j = self.weights_hidden.shape
+        for k_ in range(k):
+            for j_ in range(j):
+                self.weights_hidden[k_, j_] -= (
+                    self.learning_rate
+                    * error
+                    * self.weights_output[0, k_+1]
+                    * hidden_output[k_+1]
+                    * (1 - hidden_output[k_+1])
+                    * X[j_]
+                )
+                
+        self.weights_output -= self.learning_rate * error * hidden_output
+
+
+# wersja do commita (dziala szybciej)
+    # def backward(self, X, y, hidden_input, hidden_output, output):
+    #     X = np.concatenate(([1], X))
+    #     error = output - y
+
+    #     self.weights_hidden -= self.learning_rate * np.outer(
+    #         np.dot(error, self.weights_output[:, 1:])
+    #         * hidden_output
+    #         * (1 - hidden_output),
+    #         X,
+    #     )
+
+    #     hidden_output = np.concatenate(([1], hidden_output))
+    #     self.weights_output -= self.learning_rate * error * hidden_output
 
     def fit(self, X, y):
         rng_min = -1e-3
@@ -130,7 +156,7 @@ X, y = dataset[:, :-1], dataset[:, -1]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 mlp = MultilayerPerceptronRegressor(
-    number_of_neurons=16, number_of_steps=10e5, learning_rate=0.05, seed=0
+    number_of_neurons=16, number_of_steps=10e4, learning_rate=0.05, seed=0
 )
 
 mlp.fit(X_train, y_train)
