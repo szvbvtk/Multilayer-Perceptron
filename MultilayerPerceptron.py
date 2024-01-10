@@ -20,9 +20,7 @@ class MultilayerPerceptronRegressor(BaseEstimator, RegressorMixin):
         X = np.concatenate(([1], X))
         hidden_input = 1 + np.dot(self.weights_hidden, X)
         hidden_output = self.sigmoid(hidden_input)
-        # hidden_output_with_bias = np.concatenate(([1], hidden_output))
-        # output = np.dot(self.weights_output, hidden_output_with_bias)
-        # lub
+        
         output = self.weights_output[:, 0] + np.dot(
             self.weights_output[:, 1:], hidden_output
         )
