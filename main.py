@@ -14,7 +14,7 @@ def generate_dataset(m=1000, seed=None, error=False):
     x1 = rng.uniform(0, np.pi, m)
     x2 = rng.uniform(0, np.pi, m)
 
-    y = np.cos(x1 * x2) + np.cos(2 * x1)
+    y = np.cos(x1 * x2) * np.cos(2 * x1)
 
     if error:
         y += rng.normal(0, 0.2, m)
@@ -47,7 +47,7 @@ def draw_plots(mlp, X, y):
     ax1.set_ylabel("x2")
     ax1.set_zlabel("y")
 
-    y = np.cos(x1_v * x2_v) + np.cos(2 * x1_v)
+    y = np.cos(x1_v * x2_v) * np.cos(2 * x1_v)
     ax2.plot_surface(x1_v, x2_v, y, alpha=0.8, cmap="OrRd")
     ax2.set_facecolor("lavender")
     ax2.set_title("Wykres funkcji")
@@ -92,7 +92,10 @@ def main1(verbose=True, number_of_steps=1e5):
     X, y = dataset[:, :-1], dataset[:, -1]
 
     mlp = MultilayerPerceptronRegressor(
-        number_of_neurons=16, number_of_steps=number_of_steps, learning_rate=0.05, seed=0
+        number_of_neurons=16,
+        number_of_steps=number_of_steps,
+        learning_rate=0.05,
+        seed=0,
     )
 
     mlp.fit(X, y, verbose=verbose)
@@ -184,5 +187,5 @@ def main2(verbose=True, number_of_steps=1e5):
 
 if __name__ == "__main__":
     # test()
-    main1()
-    # main2()
+    # main1()
+    main2(False, 1e5)

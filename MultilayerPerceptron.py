@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
 
+
 class MultilayerPerceptronRegressor(BaseEstimator, RegressorMixin):
     def __init__(self, number_of_neurons, number_of_steps, learning_rate, seed):
         self.number_of_neurons = int(number_of_neurons)
@@ -20,13 +21,12 @@ class MultilayerPerceptronRegressor(BaseEstimator, RegressorMixin):
         X = np.concatenate(([1], X))
         hidden_input = 1 + np.dot(self.weights_hidden, X)
         hidden_output = self.sigmoid(hidden_input)
-        
+
         output = self.weights_output[:, 0] + np.dot(
             self.weights_output[:, 1:], hidden_output
         )
         return hidden_output, output
 
-    # wersja do oddania (rozumiem co sie tu dzieje)
     # def backward(self, X, y, hidden_output, output):
     #     X = np.concatenate(([1], X))
     #     hidden_output = np.concatenate(([1], hidden_output))
@@ -37,15 +37,14 @@ class MultilayerPerceptronRegressor(BaseEstimator, RegressorMixin):
     #             self.weights_hidden[k_, j_] -= (
     #                 self.learning_rate
     #                 * error
-    #                 * self.weights_output[0, k_+1]
-    #                 * hidden_output[k_+1]
-    #                 * (1 - hidden_output[k_+1])
+    #                 * self.weights_output[0, k_ + 1]
+    #                 * hidden_output[k_ + 1]
+    #                 * (1 - hidden_output[k_ + 1])
     #                 * X[j_]
     #             )
 
     #     self.weights_output -= self.learning_rate * error * hidden_output
 
-    # wersja do commita (dziala szybciej)
     def backward(self, X, y, hidden_output, output):
         X = np.concatenate(([1], X))
         error = output - y
